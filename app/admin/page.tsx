@@ -1,4 +1,4 @@
-import DashboardCard from '@/components/DashboardCard'
+import DashboardCard from '@/components/shared/DashboardCard'
 import db from '@/db/db'
 import { formatCurrency, formatNumber } from '@/lib/formatters'
 import { setTimeout } from 'timers/promises'

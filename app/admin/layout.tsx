@@ -1,4 +1,6 @@
-import { Nav, NavLink } from '@/components/Nav'
+import { Nav, NavLink } from '@/components/shared/Nav'
+
+export const dynamic = 'force-dynamic'
 
 const AdminLayout = ({
   children,
