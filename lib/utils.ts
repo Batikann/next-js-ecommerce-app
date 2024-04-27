@@ -20,3 +20,7 @@ async function hashPassword(password: string) {
 
   return Buffer.from(arrayBuffer).toString('base64')
 }
+
+export const wait = (duration: number) => {
+  return new Promise((resolve) => setTimeout(resolve, duration))
+}
