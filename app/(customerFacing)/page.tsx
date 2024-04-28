@@ -1,21 +1,30 @@
 import db from '@/db/db'
 import ProductGridSection from './_components/ProductGridSection'
+import { cache } from '@/lib/cache'
 
-async function getMostPopularProducts() {
-  return db.product.findMany({
-    where: { isAvailableForPurchase: true },
-    orderBy: { orders: { _count: 'desc' } },
-    take: 6,
-  })
-}
+const getMostPopularProducts = cache(
+  () => {
+    return db.product.findMany({
+      where: { isAvailableForPurchase: true },
+      orderBy: { orders: { _count: 'desc' } },
+      take: 6,
+    })
+  },
+  ['/', 'getMostPopularProducts'],
+  { revalidate: 60 * 60 * 24 }
+)
 
-async function getNewestProducts() {
-  return db.product.findMany({
-    where: { isAvailableForPurchase: true },
-    orderBy: { createdAt: 'desc' },
-    take: 6,
-  })
-}
+const getNewestProducts = cache(
+  () => {
+    return db.product.findMany({
+      where: { isAvailableForPurchase: true },
+      orderBy: { createdAt: 'desc' },
+      take: 6,
+    })
+  },
+  ['/', 'getNewestProducts'],
+  { revalidate: 60 * 60 * 24 }
+)
 
 const HomePage = () => {
   return (

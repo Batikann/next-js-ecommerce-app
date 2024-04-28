@@ -3,16 +3,16 @@ import {
   ProductCardSkeleton,
 } from '@/components/shared/ProductCard'
 import db from '@/db/db'
+import { cache } from '@/lib/cache'
 
 import { Suspense } from 'react'
 
-const getProducts = async () => {
-  const products = await db.product.findMany({
+const getProducts = cache(() => {
+  return db.product.findMany({
     where: { isAvailableForPurchase: true },
     orderBy: { name: 'desc' },
   })
-  return products
-}
+}, ['/products', 'getProducts'])
 
 const ProductsPage = () => {
   return (
