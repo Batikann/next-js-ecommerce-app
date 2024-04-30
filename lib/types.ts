@@ -18,3 +18,14 @@ export type ProductCardProps = {
   description: string
   imagePath: string
 }
+
+export type CheckoutPropsType = {
+  product: {
+    id: string
+    imagePath: string
+    name: string
+    priceInCents: number
+    description: string
+  }
+  clientSecret: string
+}

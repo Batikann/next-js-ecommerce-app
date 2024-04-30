@@ -1,10 +1,9 @@
 import DashboardCard from '@/components/shared/DashboardCard'
 import db from '@/db/db'
 import { formatCurrency, formatNumber } from '@/lib/formatters'
-import { setTimeout } from 'timers/promises'
 
 async function getSalesData() {
-  const data = await db?.order.aggregate({
+  const data = await db.order.aggregate({
     _sum: { pricePaidInCents: true },
     _count: true,
   })
@@ -62,7 +61,7 @@ const AdminDashboard = async () => {
       <DashboardCard
         title="Sales"
         subtitle={`${formatNumber(salesData.numberOfSales)} Orders`}
-        body={formatCurrency(salesData.numberOfSales)}
+        body={formatCurrency(salesData.amount)}
       />
       <DashboardCard
         title="Customers"
