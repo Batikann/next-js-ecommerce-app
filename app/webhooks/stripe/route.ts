@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     })
 
     await resend.emails.send({
-      from: `Support <${process.env.SENDER_EMAIL}>`,
+      from: `${process.env.SENDER_EMAIL}`,
       to: email,
       subject: 'Order Confirmation',
       html: '<p>Congrats on sending your <strong>first email</strong>!</p>',
