@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "email": "copy .env .\node_modules\react-email && email dev --dir src/email --port 3001"
   },
   "dependencies": {
     "@prisma/client": "^5.13.0",
