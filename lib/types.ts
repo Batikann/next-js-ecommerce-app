@@ -1,4 +1,4 @@
-import { Product } from '@prisma/client'
+import { DiscountCodeType, Product } from '@prisma/client'
 
 export type DashboardCardType = {
   title: string
@@ -28,4 +28,9 @@ export type CheckoutPropsType = {
     description: string
   }
   clientSecret: string
+  discountCode?: {
+    id: string
+    discountAmount: number
+    discountType: DiscountCodeType
+  }
 }
