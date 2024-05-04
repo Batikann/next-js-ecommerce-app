@@ -1,6 +1,6 @@
 'use client'
 
-import { userOrderExists } from '@/app/actions/orders'
+import { createPaymentIntent } from '@/app/actions/orders'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -33,11 +33,7 @@ const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
 )
 
-const CheckoutForm = ({
-  product,
-  clientSecret,
-  discountCode,
-}: CheckoutPropsType) => {
+const CheckoutForm = ({ product, discountCode }: CheckoutPropsType) => {
   const amount =
     discountCode == null
       ? product.priceInCents
@@ -77,9 +73,12 @@ const CheckoutForm = ({
             </div>
           </div>
         </div>
-        <Elements options={{ clientSecret }} stripe={stripePromise}>
+        <Elements
+          options={{ amount, mode: 'payment', currency: 'usd' }}
+          stripe={stripePromise}
+        >
           <Form
-            price={product.priceInCents}
+            price={amount}
             productId={product.id as string}
             discountCode={discountCode}
           />
@@ -121,12 +120,20 @@ function Form({
 
     setIsLoading(true)
 
-    const orderExist = await userOrderExists(email, productId)
+    const formSubmit = await elements.submit()
+    if (formSubmit.error != null) {
+      setErrorMessage(formSubmit.error.message)
+      setIsLoading(false)
+      return
+    }
 
-    if (orderExist) {
-      setErrorMessage(
-        'You have already purchased this product.Try dowloading it from the my orders page'
-      )
+    const paymentIntent = await createPaymentIntent(
+      email,
+      productId,
+      discountCode?.id
+    )
+    if (paymentIntent.error != null) {
+      setErrorMessage(paymentIntent.error)
       setIsLoading(false)
       return
     }
@@ -134,6 +141,7 @@ function Form({
     stripe
       .confirmPayment({
         elements,
+        clientSecret: paymentIntent.clientSecret,
         confirmParams: {
           return_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/stripe/purchase-success`,
         },

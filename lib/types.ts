@@ -27,7 +27,6 @@ export type CheckoutPropsType = {
     priceInCents: number
     description: string
   }
-  clientSecret: string
   discountCode?: {
     id: string
     discountAmount: number
