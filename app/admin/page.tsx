@@ -21,6 +21,8 @@ import {
   subDays,
 } from 'date-fns'
 import { UsersByDayChart } from './_components/_charts/UsersByDayChart'
+import { RevenueByProductChart } from './_components/_charts/RevenueByProductChart'
+import { RANGE_OPTIONS, getRangeOption } from '@/lib/rangeOptions'
 
 async function getSalesData(
   createdAfter: Date | null,
@@ -115,29 +117,88 @@ async function getUserData(
   }
 }
 
-async function getProductData() {
-  const [activeCount, inactiveCount] = await Promise.all([
-    db.product.count({
-      where: { isAvailableForPurchase: true },
-    }),
-    db.product.count({
-      where: { isAvailableForPurchase: false },
+async function getProductData(
+  createdAfter: Date | null,
+  createdBefore: Date | null
+) {
+  const createdAtQuery: Prisma.OrderWhereInput['createdAt'] = {}
+  if (createdAfter) createdAtQuery.gte = createdAfter
+  if (createdBefore) createdAtQuery.lte = createdBefore
+
+  const [activeCount, inactiveCount, chartData] = await Promise.all([
+    db.product.count({ where: { isAvailableForPurchase: true } }),
+    db.product.count({ where: { isAvailableForPurchase: false } }),
+    db.product.findMany({
+      select: {
+        name: true,
+        orders: {
+          select: { pricePaidInCents: true },
+          where: { createdAt: createdAtQuery },
+        },
+      },
     }),
   ])
-  return { activeCount, inactiveCount }
+  return {
+    activeCount,
+    inactiveCount,
+    chartData: chartData
+      .map((product) => {
+        return {
+          name: product.name,
+          revenue: product.orders.reduce((sum, order) => {
+            return sum + order.pricePaidInCents / 100
+          }, 0),
+        }
+      })
+      .filter((product) => product.revenue > 0),
+  }
 }
 
-const AdminDashboard = async () => {
-  const data = {
-    title: 'Sales',
-    subtitle: 'desc',
-    body: 'Test',
+const AdminDashboard = async ({
+  searchParams: {
+    totalSalesRange,
+    totalSalesRangeFrom,
+    totalSalesRangeTo,
+    newCustomersRange,
+    newCustomersRangeFrom,
+    newCustomersRangeTo,
+    revenueByProductRange,
+    revenueByProductRangeFrom,
+    revenueByProductRangeTo,
+  },
+}: {
+  searchParams: {
+    totalSalesRange?: string
+    totalSalesRangeFrom?: string
+    totalSalesRangeTo?: string
+    newCustomersRange?: string
+    newCustomersRangeFrom?: string
+    newCustomersRangeTo?: string
+    revenueByProductRange?: string
+    revenueByProductRangeFrom?: string
+    revenueByProductRangeTo?: string
   }
+}) => {
+  const totalSalesRangeOption =
+    getRangeOption(totalSalesRange) || RANGE_OPTIONS.last_7_days
+  const newCustomersRangeOption =
+    getRangeOption(newCustomersRange) || RANGE_OPTIONS.last_7_days
+  const revenueByProductRangeOption =
+    getRangeOption(revenueByProductRange) || RANGE_OPTIONS.all_time
 
   const [salesData, userData, productData] = await Promise.all([
-    getSalesData(subDays(new Date(), 16), new Date()),
-    getUserData(subDays(new Date(), 16), new Date()),
-    getProductData(),
+    getSalesData(
+      totalSalesRangeOption.startDate,
+      totalSalesRangeOption.endDate
+    ),
+    getUserData(
+      newCustomersRangeOption.startDate,
+      newCustomersRangeOption.endDate
+    ),
+    getProductData(
+      revenueByProductRangeOption.startDate,
+      revenueByProductRangeOption.endDate
+    ),
   ])
 
   return (
@@ -162,11 +223,26 @@ const AdminDashboard = async () => {
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2  gap-4 mt-4">
-        <ChartCard title="Total Sales">
+        <ChartCard
+          title="Total Sales"
+          queryKey="totalSalesRange"
+          selectedRangeLabel={totalSalesRangeOption.label}
+        >
           <OrdersByDayChart data={salesData.chartData} />
         </ChartCard>
-        <ChartCard title="New Customers">
+        <ChartCard
+          title="New Customers"
+          queryKey="newCustomersRange"
+          selectedRangeLabel={newCustomersRangeOption.label}
+        >
           <UsersByDayChart data={userData.chartData} />
+        </ChartCard>
+        <ChartCard
+          title="Revenue By Product"
+          queryKey="revenueByProductRange"
+          selectedRangeLabel={revenueByProductRangeOption.label}
+        >
+          <RevenueByProductChart data={productData.chartData} />
         </ChartCard>
       </div>
     </>
