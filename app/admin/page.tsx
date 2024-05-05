@@ -180,11 +180,20 @@ const AdminDashboard = async ({
   }
 }) => {
   const totalSalesRangeOption =
-    getRangeOption(totalSalesRange) || RANGE_OPTIONS.last_7_days
+    getRangeOption(totalSalesRange, totalSalesRangeFrom, totalSalesRangeTo) ||
+    RANGE_OPTIONS.last_7_days
   const newCustomersRangeOption =
-    getRangeOption(newCustomersRange) || RANGE_OPTIONS.last_7_days
+    getRangeOption(
+      newCustomersRange,
+      newCustomersRangeFrom,
+      newCustomersRangeTo
+    ) || RANGE_OPTIONS.last_7_days
   const revenueByProductRangeOption =
-    getRangeOption(revenueByProductRange) || RANGE_OPTIONS.all_time
+    getRangeOption(
+      revenueByProductRange,
+      revenueByProductRangeFrom,
+      revenueByProductRangeTo
+    ) || RANGE_OPTIONS.all_time
 
   const [salesData, userData, productData] = await Promise.all([
     getSalesData(
