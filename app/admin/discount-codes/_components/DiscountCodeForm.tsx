@@ -46,7 +46,7 @@ const DiscountCodeForm = ({
             </div>
             <div className="flex gap-2 items-center">
               <RadioGroupItem id="fixed" value={DiscountCodeType.FIXED} />
-              <Label htmlFor="percentage">Fixed</Label>
+              <Label htmlFor="fixed">Fixed</Label>
             </div>
           </RadioGroup>
           {error.discountType && (

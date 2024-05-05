@@ -12,7 +12,7 @@ const PurchasePage = async ({
 }) => {
   const product = await db.product.findUnique({ where: { id } })
 
-  if (product === null) return notFound()
+  if (product == null) return notFound()
 
   const discountCode =
     coupon == null ? undefined : await getDiscountCode(coupon, product.id)

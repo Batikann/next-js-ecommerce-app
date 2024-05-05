@@ -5,7 +5,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '../ui/card'
+} from '../../../components/ui/card'
 
 const DashboardCard = ({ title, subtitle, body }: DashboardCardType) => {
   return (

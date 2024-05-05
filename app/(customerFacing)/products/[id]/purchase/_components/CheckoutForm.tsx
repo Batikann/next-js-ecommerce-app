@@ -38,7 +38,7 @@ const CheckoutForm = ({ product, discountCode }: CheckoutPropsType) => {
     discountCode == null
       ? product.priceInCents
       : getDiscountedAmount(discountCode, product.priceInCents)
-  const isDiscounted = amount !== product.priceInCents
+  const isDiscounted = amount != product.priceInCents
   return (
     <>
       <div className="max-w-5xl w-full mx-auto space-y-8">

@@ -33,3 +33,10 @@ export type CheckoutPropsType = {
     discountType: DiscountCodeType
   }
 }
+
+export type OrderByDayChartsProps = {
+  data: {
+    date: string
+    totalSales: number
+  }[]
+}

@@ -36,6 +36,7 @@ export async function createPaymentIntent(
   if (discountCode == null && discountCodeId != null) {
     return { error: 'Coupon has expired' }
   }
+
   const existingOrder = await db.order.findFirst({
     where: { user: { email }, productId },
     select: { id: true },
@@ -44,7 +45,7 @@ export async function createPaymentIntent(
   if (existingOrder != null) {
     return {
       error:
-        'You have already purchased this product.Try dowloading it from the my orders page',
+        'You have already purchased this product. Try downloading it from the My Orders page',
     }
   }
 
@@ -63,7 +64,7 @@ export async function createPaymentIntent(
   })
 
   if (paymentIntent.client_secret == null) {
-    return { error: 'unkown error' }
+    return { error: 'Unknown error' }
   }
 
   return { clientSecret: paymentIntent.client_secret }
